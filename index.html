@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kieliharjoituspeli</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .hint-list {
+            margin-top: 20px;
+        }
+
+        .hint-item {
+            margin-bottom: 10px;
+        }
+
+        #feedback {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .quiz-option {
+            margin-top: 10px;
+            display: block;
+        }
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">Kieliharjoituspeli</h1>
+
+    <div id="game-area" class="mt-5">
+        <!-- This is where game content (questions) will appear -->
+    </div>
+
+    <div id="feedback"></div>
+
+    <button id="next-question" class="btn btn-primary mt-3" style="display: none;">Seuraava kysymys</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(function() {
+        const words = [
+            { word: "en platta", forms: ["en platta", "plattan", "plattor", "plattorna"] },
+            { word: "en skärm", forms: ["en skärm", "skärmen" },
+            { word: "en tidning", forms: ["en tidning", "tidningen", "tidningar", "tidningarna"] },
+            { word: "en bild", forms: ["en bild", "bilden", "bilder", "bilderna"] },
+            { word: "ett videoklipp", forms: ["ett videoklipp", "videoklippet", "videoklipp", "videoklippen"] },
+            { word: "en rubrik", forms: ["en rubrik", "rubriken", "rubriker", "rubrikerna"] },
+            { word: "en bror", forms: ["en bror", "brodern", "bröder", "bröderna"] },
+            { word: "ett nät", forms: ["ett nät", "nätet", "nät", "näten"] }
+        ];
+
+        const quizQuestions = [
+            { question: "Mikä on ruotsiksi 'veli'?", options: ["en syster", "en bror", "en far"], correct: "en bror" },
+            { question: "Mikä on suomeksi 'en tidning'?", options: ["verho", "sanomalehti", "tietokone"], correct: "sanomalehti" },
+            { question: "Mikä on ruotsiksi 'tabletti'?", options: ["en dator", "en platta", "en skärm"], correct: "en platta" },
+            { question: "Mikä on suomeksi 'en skärm'?", options: ["näyttö", "tabletti", "tietokone"], correct: "näyttö" },
+            { question: "Mikä tarkoittaa 'i går kväll'?", options: ["aamulla", "eilen illalla", "huomenna"], correct: "eilen illalla" },
+            { question: "Mikä on suomeksi 'dygnet runt'?", options: ["päivän aikana", "yöllä", "vuorokauden ympäri"], correct: "vuorokauden ympäri" },
+            { question: "Mitä tarkoittaa 'snabbare och roligare'?", options: ["nopeampi ja hauskempi", "komein", "parempi kuin"], correct: "nopeampi ja hauskempi" },
+            { question: "Mikä on suomeksi 'ett nät'?", options: ["netti", "kuva", "sanomalehti"], correct: "netti" },
+            { question: "Mitä tarkoittaa 'bättre än'?", options: ["huonompi kuin", "parempi kuin", "halvin"], correct: "parempi kuin" },
+            { question: "Mitä tarkoittaa 'snyggast'?", options: ["komein", "nopein", "halvin"], correct: "komein" },
+            { question: "Mikä tarkoittaa 'efter nyheterna'?", options: ["uutisten jälkeen", "ennen uutisia", "uutisten aikana"], correct: "uutisten jälkeen" },
+            { question: "Mitä tarkoittaa 'tillsammans'?", options: ["yksin", "yhdessä", "koko maailma"], correct: "yhdessä" },
+            { question: "Mikä tarkoittaa 'hela världen'?", options: ["koko maailma", "koko perhe", "kaikki kaverit"], correct: "koko maailma" }
+        ];
+
+        let usedWords = [];
+        let usedQuizzes = [];
+        let currentWordData = null;
+        let currentMissingFormIndex = null;
+        let currentQuestionType = null; // Either 'form' or 'quiz'
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function getNextQuestion() {
+            $("#feedback").hide();
+            $("#next-question").hide();
+            $("#game-area").empty();
+
+            if (Math.random() > 0.5 && usedWords.length < words.length) {
+                currentQuestionType = 'form';
+                let wordData = words.find(word => !usedWords.includes(word.word));
+                usedWords.push(wordData.word);
+
+                currentWordData = wordData;
+                currentMissingFormIndex = Math.floor(Math.random() * wordData.forms.length);
+                displayWordFormQuestion(wordData, currentMissingFormIndex);
+            } else if (usedQuizzes.length < quizQuestions.length) {
+                currentQuestionType = 'quiz';
+                let quizData = quizQuestions.find(quiz => !usedQuizzes.includes(quiz.question));
+                usedQuizzes.push(quizData.question);
+                displayQuiz(quizData);
+            }
+
+            // Reset question lists after all have been asked
+            if (usedWords.length === words.length && usedQuizzes.length === quizQuestions.length) {
+                usedWords = [];
+                usedQuizzes = [];
+            }
+        }
+
+        function displayWordFormQuestion(wordData, missingFormIndex) {
+            const hints = wordData.forms.map((form, index) => {
+                if (index === missingFormIndex) {
+                    return `<strong>täydennä</strong> `;
+                }
+                return `<span class="hint-item">${form}</span>`;
+            }).join(', ');
+
+            $("#game-area").html(`
+                <h3>Anna oikea muoto sanasta: ${wordData.word}</h3>
+                <div class="hint-list">${hints}</div>
+                <input type="text" id="user-answer" class="form-control mt-3" placeholder="Kirjoita puuttuva muoto">
+                <button id="check-answer" class="btn btn-primary mt-3">Tarkista</button>
+            `);
+
+            $("#check-answer").click(function() {
+                checkAnswer();
+            });
+        }
+
+        function checkAnswer() {
+            const userAnswer = $("#user-answer").val().trim();
+            const correctAnswer = currentWordData.forms[currentMissingFormIndex];
+
+            if (userAnswer === correctAnswer) {
+                $("#feedback").text("Oikein!").removeClass("incorrect").addClass("correct").show();
+            } else {
+                $("#feedback").text(`Väärin! Oikea vastaus on: ${correctAnswer}`).removeClass("correct").addClass("incorrect").show();
+            }
+
+            $("#next-question").show();
+        }
+
+        function displayQuiz(quizData) {
+            $("#game-area").html(`
+                <h3>${quizData.question}</h3>
+                <div id="quiz-options" class="mt-3"></div>
+            `);
+
+            quizData.options.forEach(option => {
+                $("#quiz-options").append(`
+                    <button class="btn btn-outline-primary quiz-option" data-correct="${option === quizData.correct}">${option}</button>
+                `);
+            });
+
+            $(".quiz-option").click(function() {
+                const isCorrect = $(this).data("correct") === true;
+                if (isCorrect) {
+                    $("#feedback").text("Oikein!").removeClass("incorrect").addClass("correct").show();
+                } else {
+                    $("#feedback").text("Väärin!").removeClass("correct").addClass("incorrect").show();
+                }
+
+                $("#next-question").show();
+            });
+        }
+
+        getNextQuestion();
+
+        $("#next-question").click(getNextQuestion);
+    });
+</script>
+
+</body>
+</html>
