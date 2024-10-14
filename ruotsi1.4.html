@@ -57,6 +57,7 @@
 <script>
     $(function() {
         let score = 0;
+        let nscore = 0;
         let totalQuestions = 0;
 
         const words = [
@@ -265,6 +266,7 @@
                     score++;
                     $("#feedback").text("Oikein!").removeClass("incorrect").addClass("correct").show();
                 } else {
+                    nscore++;
                     $("#feedback").text("Väärin!").removeClass("correct").addClass("incorrect").show();
                 }
 
@@ -275,7 +277,7 @@
 
         // Päivitä pistetilanne
         function updateScore() {
-            $("#score").text(`Pisteet: ${score}`);
+            $("#score").text(`Pisteet: ${score}/${totalQuestions}, Virheet: ${nscore}`);
         }
 
         // Kun kaikki kysymykset on käyty läpi
