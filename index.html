@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kieliharjoituspeli v2</title>
+    <title>Kieliharjoituspeli</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -27,13 +27,14 @@
             margin-top: 10px;
             display: block;
         }
-.correct {
-    color: green;
-}
 
-.incorrect {
-    color: red;
-}
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -54,30 +55,46 @@
 <script>
     $(function() {
         const words = [
-            { word: "en platta", forms: ["en platta", "plattan", "plattor", "plattorna"] },
-            { word: "en skärm", forms: ["en skärm", "skärmen" },
-            { word: "en tidning", forms: ["en tidning", "tidningen", "tidningar", "tidningarna"] },
-            { word: "en bild", forms: ["en bild", "bilden", "bilder", "bilderna"] },
-            { word: "ett videoklipp", forms: ["ett videoklipp", "videoklippet", "videoklipp", "videoklippen"] },
-            { word: "en rubrik", forms: ["en rubrik", "rubriken", "rubriker", "rubrikerna"] },
-            { word: "en bror", forms: ["en bror", "brodern", "bröder", "bröderna"] },
-            { word: "ett nät", forms: ["ett nät", "nätet", "nät", "näten"] }
+            { word: "en platta", forms: ["platta", "plattan", "plattor", "plattorna"] },
+            { word: "en skärm", forms: ["skärm", "skärmen", "skärmar", "skärmarna"] },
+            { word: "en tidning", forms: ["tidning", "tidningen", "tidningar", "tidningarna"] },
+            { word: "en bild", forms: ["bild", "bilden", "bilder", "bilderna"] },
+            { word: "ett videoklipp", forms: ["videoklipp", "videoklippet", "videoklipp", "videoklippen"] },
+            { word: "en rubrik", forms: ["rubrik", "rubriken", "rubriker", "rubrikerna"] },
+            { word: "en bror", forms: ["bror", "brodern", "bröder", "bröderna"] },
+            { word: "ett nät", forms: ["nät", "nätet", "nät", "näten"] }
         ];
 
         const quizQuestions = [
+            // Kysymykset suomi -> ruotsi
             { question: "Mikä on ruotsiksi 'veli'?", options: ["en syster", "en bror", "en far"], correct: "en bror" },
-            { question: "Mikä on suomeksi 'en tidning'?", options: ["verho", "sanomalehti", "tietokone"], correct: "sanomalehti" },
+            { question: "Mikä on ruotsiksi 'sanomalehti'?", options: ["en bok", "en tidning", "en dator"], correct: "en tidning" },
             { question: "Mikä on ruotsiksi 'tabletti'?", options: ["en dator", "en platta", "en skärm"], correct: "en platta" },
+            { question: "Mikä on ruotsiksi 'näyttö'?", options: ["en skärm", "en rubrik", "en tidning"], correct: "en skärm" },
+            { question: "Mikä on ruotsiksi 'kuva'?", options: ["en tidning", "en bild", "ett nät"], correct: "en bild" },
+            { question: "Mikä on ruotsiksi 'videoklippi'?", options: ["ett videoklipp", "en skärm", "ett nät"], correct: "ett videoklipp" },
+            { question: "Mikä on ruotsiksi 'otsikko'?", options: ["en bild", "en rubrik", "en bror"], correct: "en rubrik" },
+            { question: "Mikä on ruotsiksi 'netti'?", options: ["ett nät", "ett videoklipp", "en skärm"], correct: "ett nät" },
+            { question: "Mikä on ruotsiksi 'tietokoneella'?", options: ["vid datorn", "på datorn", "under datorn"], correct: "vid datorn" },
+            { question: "Mikä tarkoittaa 'eilen illalla'?", options: ["i går kväll", "efter nyheterna", "snabbare och roligare"], correct: "i går kväll" },
+            { question: "Mikä tarkoittaa 'vuorokauden ympäri'?", options: ["dygnet runt", "hela världen", "efter nyheterna"], correct: "dygnet runt" },
+            { question: "Mikä tarkoittaa 'parempi kuin'?", options: ["bättre än", "snyggast", "billigast"], correct: "bättre än" },
+            { question: "Mikä tarkoittaa 'komein'?", options: ["snyggast", "bättre än", "billigast"], correct: "snyggast" },
+            { question: "Mikä tarkoittaa 'halvin'?", options: ["billigast", "snyggast", "bättre än"], correct: "billigast" },
+            { question: "Mikä tarkoittaa 'yhdessä'?", options: ["tillsammans", "hela världen", "vid datorn"], correct: "tillsammans" },
+            { question: "Mikä tarkoittaa 'koko maailma'?", options: ["hela världen", "hela familjen", "tillsammans"], correct: "hela världen" },
+
+            // Kysymykset ruotsi -> suomi
+            { question: "Mikä on suomeksi 'en tidning'?", options: ["sanomalehti", "verho", "tietokone"], correct: "sanomalehti" },
             { question: "Mikä on suomeksi 'en skärm'?", options: ["näyttö", "tabletti", "tietokone"], correct: "näyttö" },
-            { question: "Mikä tarkoittaa 'i går kväll'?", options: ["aamulla", "eilen illalla", "huomenna"], correct: "eilen illalla" },
-            { question: "Mikä on suomeksi 'dygnet runt'?", options: ["päivän aikana", "yöllä", "vuorokauden ympäri"], correct: "vuorokauden ympäri" },
-            { question: "Mitä tarkoittaa 'snabbare och roligare'?", options: ["nopeampi ja hauskempi", "komein", "parempi kuin"], correct: "nopeampi ja hauskempi" },
+            { question: "Mikä on suomeksi 'en platta'?", options: ["tabletti", "tietokone", "näyttö"], correct: "tabletti" },
+            { question: "Mikä on suomeksi 'en bror'?", options: ["veli", "sisko", "isä"], correct: "veli" },
             { question: "Mikä on suomeksi 'ett nät'?", options: ["netti", "kuva", "sanomalehti"], correct: "netti" },
-            { question: "Mitä tarkoittaa 'bättre än'?", options: ["huonompi kuin", "parempi kuin", "halvin"], correct: "parempi kuin" },
-            { question: "Mitä tarkoittaa 'snyggast'?", options: ["komein", "nopein", "halvin"], correct: "komein" },
-            { question: "Mikä tarkoittaa 'efter nyheterna'?", options: ["uutisten jälkeen", "ennen uutisia", "uutisten aikana"], correct: "uutisten jälkeen" },
-            { question: "Mitä tarkoittaa 'tillsammans'?", options: ["yksin", "yhdessä", "koko maailma"], correct: "yhdessä" },
-            { question: "Mikä tarkoittaa 'hela världen'?", options: ["koko maailma", "koko perhe", "kaikki kaverit"], correct: "koko maailma" }
+            { question: "Mikä on suomeksi 'ett videoklipp'?", options: ["videoklippi", "kuva", "netti"], correct: "videoklippi" },
+            { question: "Mikä tarkoittaa 'i går kväll'?", options: ["eilen illalla", "huomenna", "yöllä"], correct: "eilen illalla" },
+            { question: "Mikä on suomeksi 'dygnet runt'?", options: ["vuorokauden ympäri", "koko päivän", "yöllä"], correct: "vuorokauden ympäri" },
+            { question: "Mitä tarkoittaa 'efter nyheterna'?", options: ["uutisten jälkeen", "uutisten aikana", "ennen uutisia"], correct: "uutisten jälkeen" },
+            { question: "Mitä tarkoittaa 'snabbare och roligare'?", options: ["nopeampi ja hauskempi", "komein", "halvin"], correct: "nopeampi ja hauskempi" }
         ];
 
         let usedWords = [];
@@ -95,6 +112,7 @@
             $("#next-question").hide();
             $("#game-area").empty();
 
+            // Satunnaisesti valitaan tekstikysymys (muotojen kysyminen) tai monivalintakysymys
             if (Math.random() > 0.5 && usedWords.length < words.length) {
                 currentQuestionType = 'form';
                 let wordData = words.find(word => !usedWords.includes(word.word));
@@ -110,17 +128,18 @@
                 displayQuiz(quizData);
             }
 
-            // Reset question lists after all have been asked
+            // Kysymysten resetointi, kun kaikki kysymykset on käyty läpi
             if (usedWords.length === words.length && usedQuizzes.length === quizQuestions.length) {
                 usedWords = [];
                 usedQuizzes = [];
             }
         }
 
+        // Näytetään sana ja muut taivutusmuodot, paitsi yksi
         function displayWordFormQuestion(wordData, missingFormIndex) {
             const hints = wordData.forms.map((form, index) => {
                 if (index === missingFormIndex) {
-                    return `<strong>täydennä</strong> `;
+                    return `<strong>_______</strong> `;
                 }
                 return `<span class="hint-item">${form}</span>`;
             }).join(', ');
@@ -137,6 +156,7 @@
             });
         }
 
+        // Tarkistetaan käyttäjän antama vastaus
         function checkAnswer() {
             const userAnswer = $("#user-answer").val().trim();
             const correctAnswer = currentWordData.forms[currentMissingFormIndex];
@@ -150,6 +170,7 @@
             $("#next-question").show();
         }
 
+        // Näytetään monivalintakysymys
         function displayQuiz(quizData) {
             $("#game-area").html(`
                 <h3>${quizData.question}</h3>
