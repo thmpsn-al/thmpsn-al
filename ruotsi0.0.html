@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kieliharjoittelu: Monivalintapeli</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .question {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .options {
+            margin-top: 20px;
+        }
+        .option {
+            padding: 10px;
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .option:hover {
+            background-color: #e0e0e0;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kieliharjoittelu: Monivalintapeli</h1>
+        <div id="game">
+            <p class="question" id="question">Kysymys tulee tähän...</p>
+            <div class="options">
+                <div class="option" id="option1" onclick="checkAnswer(0)">Vaihtoehto 1</div>
+                <div class="option" id="option2" onclick="checkAnswer(1)">Vaihtoehto 2</div>
+                <div class="option" id="option3" onclick="checkAnswer(2)">Vaihtoehto 3</div>
+            </div>
+            <div class="result" id="result"></div>
+            <button onclick="nextQuestion()">Seuraava kysymys</button>
+        </div>
+    </div>
+
+    <script>
+        const words = {
+            "fi_to_sv": {
+                "tabletti": "en platta",
+                "näyttö": "en skärm",
+                "eilen illalla": "i går kväll",
+                "vuorokauden ympäri": "dygnet runt",
+                "otsikko": "en rubrik",
+                "ei mitään erityistä": "inget speciellt",
+                "meneillään": "på gång",
+                "sanomalehti": "en tidning",
+                "netti": "ett nät",
+                "nopeampi ja hauskempi": "snabbare och roligare",
+                "uutisten jälkeen": "efter nyheterna",
+                "kuva": "en bild",
+                "videoklippi": "ett videoklipp",
+                "parempi kuin": "bättre än",
+                "komein": "snyggast",
+                "veli": "en bror",
+                "halvin": "billigast",
+                "tietokoneella": "vid datorn",
+                "yhdessä": "tillsammans",
+                "koko maailma": "hela världen",
+                "mahtava, siisti, upea": "häftig",
+                "siisti": "snygg",
+                "nopea": "snabb",
+                "hauska": "rolig",
+                "hyvä": "bra",
+                "halpa": "billig",
+                "kallis": "dyr",
+                "viihtyisä": "mysig",
+                "vaikea": "svår",
+                "lämmin": "varm",
+                "mukava": "trevlig",
+                "lyhyt": "kort",
+                "iloinen": "glad",
+                "ikävä, tylsä": "tråkig",
+                "urheilullinen": "sportig",
+                "söpö": "söt",
+                "taitava": "duktig",
+                "hassu": "tokig",
+                "hieno": "fin",
+                "suuri": "stor",
+                "vanha": "gammal",
+                "pitkä": "lång",
+                "nuori": "ung",
+                "huono": "dålig"
+            },
+            "sv_to_fi": {
+                "en platta": "tabletti",
+                "en skärm": "näyttö",
+                "i går kväll": "eilen illalla",
+                "dygnet runt": "vuorokauden ympäri",
+                "en rubrik": "otsikko",
+                "inget speciellt": "ei mitään erityistä",
+                "på gång": "meneillään",
+                "en tidning": "sanomalehti",
+                "ett nät": "netti",
+                "snabbare och roligare": "nopeampi ja hauskempi",
+                "efter nyheterna": "uutisten jälkeen",
+                "en bild": "kuva",
+                "ett videoklipp": "videoklippi",
+                "bättre än": "parempi kuin",
+                "snyggast": "komein",
+                "en bror": "veli",
+                "billigast": "halvin",
+                "vid datorn": "tietokoneella",
+                "tillsammans": "yhdessä",
+                "hela världen": "koko maailma",
+                "häftig": "mahtava, siisti, upea",
+                "snygg": "siisti",
+                "snabb": "nopea",
+                "rolig": "hauska",
+                "bra": "hyvä",
+                "billig": "halpa",
+                "dyr": "kallis",
+                "mysig": "viihtyisä",
+                "svår": "vaikea",
+                "varm": "lämmin",
+                "trevlig": "mukava",
+                "kort": "lyhyt",
+                "glad": "iloinen",
+                "tråkig": "ikävä, tylsä",
+                "sportig": "urheilullinen",
+                "söt": "söpö",
+                "duktig": "taitava",
+                "tokig": "hassu",
+                "fin": "hieno",
+                "stor": "suuri",
+                "gammal": "vanha",
+                "lång": "pitkä",
+                "ung": "nuori",
+                "dålig": "huono"
+            }
+        };
+
+        let currentWord = '';
+        let correctAnswer = '';
+        let options = [];
+        let usedWords = [];
+        let availableWords = [];
+
+        function initializeGame() {
+            availableWords = [
+                ...Object.entries(words["fi_to_sv"]),
+                ...Object.entries(words["sv_to_fi"])
+            ];
+            shuffleArray(availableWords);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function generateQuestion() {
+            if (availableWords.length === 0) {
+                // Reset once all words are used
+                initializeGame();
+            }
+
+            // Get next word
+            const wordPair = availableWords.pop();
+            currentWord = wordPair[0];
+            correctAnswer = wordPair[1];
+            usedWords.push(wordPair);
+
+            // Generate answer options based on the direction
+            options = [correctAnswer];
+            if (currentWord in words["fi_to_sv"]) {
+                // When asking from Finnish to Swedish, options must be in Swedish
+                while (options.length < 3) {
+                    const randomWord = words["fi_to_sv"][Object.keys(words["fi_to_sv"])[Math.floor(Math.random() * Object.keys(words["fi_to_sv"]).length)]];
+                    if (!options.includes(randomWord)) {
+                        options.push(randomWord);
+                    }
+                }
+                document.getElementById('question').textContent = `Mikä on "${currentWord}" ruotsiksi?`;
+            } else {
+                // When asking from Swedish to Finnish, options must be in Finnish
+                while (options.length < 3) {
+                    const randomWord = words["sv_to_fi"][Object.keys(words["sv_to_fi"])[Math.floor(Math.random() * Object.keys(words["sv_to_fi"]).length)]];
+                    if (!options.includes(randomWord)) {
+                        options.push(randomWord);
+                    }
+                }
+                document.getElementById('question').textContent = `Mikä on "${currentWord}" suomeksi?`;
+            }
+
+            shuffleArray(options);
+
+            document.getElementById('option1').textContent = options[0];
+            document.getElementById('option2').textContent = options[1];
+            document.getElementById('option3').textContent = options[2];
+            document.getElementById('result').textContent = '';
+        }
+
+        function checkAnswer(selectedOption) {
+            if (options[selectedOption] === correctAnswer) {
+                document.getElementById('result').textContent = 'Oikein!';
+                document.getElementById('result').style.color = 'green';
+            } else {
+                document.getElementById('result').textContent = `Väärin! Oikea vastaus on: ${correctAnswer}`;
+                document.getElementById('result').style.color = 'red';
+            }
+        }
+
+        function nextQuestion() {
+            generateQuestion();
+        }
+
+        // Alustetaan peli ja ensimmäinen kysymys
+        initializeGame();
+        generateQuestion();
+    </script>
+</body>
+</html>
+
